@@ -25,12 +25,23 @@ function createMap() {
             tile.textContent = "⚔️";
         }
 
-        // Neutrala territorier
-        else {
-            tile.classList.add("neutral");
-            tile.textContent = "🌲";
-        }
+     // Berg
+else if (i === 6 || i === 18) {
+    tile.classList.add("mountain");
+    tile.textContent = "⛰️";
+}
 
+// Jordbruksmark
+else if (i === 7 || i === 17) {
+    tile.classList.add("farmland");
+    tile.textContent = "🌾";
+}
+
+// Skog
+else {
+    tile.classList.add("neutral");
+    tile.textContent = "🌲";
+}
         tile.addEventListener("click", () => attack(tile));
 
         map.appendChild(tile);
