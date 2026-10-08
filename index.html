@@ -1,7 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Empire Wars</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -9,11 +13,29 @@
 
     <h1>⚔️ Empire Wars</h1>
 
-    <p>Mitt första strategispel!</p>
+    <div class="stats">
+        💰 Guld: <span id="gold">100</span>
+        |
+        ⚔️ Armé: <span id="army">10</span>
+        |
+        🏰 Områden: <span id="territory">1</span>
+    </div>
 
-    <button onclick="alert('Spelet fungerar! 🔥')">
-        Starta spelet
+    <h2>🗺️ Din karta</h2>
+
+    <div id="map"></div>
+
+    <p id="message">Klicka på ett område för att attackera.</p>
+
+    <button id="recruit">
+        ⚔️ Rekrytera soldater
     </button>
+
+    <button id="endTurn">
+        ⏭️ Avsluta tur
+    </button>
+
+    <script src="game.js"></script>
 
 </body>
 </html>
