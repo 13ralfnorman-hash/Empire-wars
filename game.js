@@ -13,10 +13,20 @@ function createMap() {
 
         tile.classList.add("tile");
 
+        // Ditt territorium
         if (i === 12) {
             tile.classList.add("player");
             tile.textContent = "🏰";
-        } else {
+        }
+
+        // Fiendens territorier
+        else if (i === 0 || i === 4 || i === 20 || i === 24) {
+            tile.classList.add("enemy");
+            tile.textContent = "⚔️";
+        }
+
+        // Neutrala territorier
+        else {
             tile.classList.add("neutral");
             tile.textContent = "🌲";
         }
