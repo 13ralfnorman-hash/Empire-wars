@@ -20,16 +20,19 @@ h1 {
     grid-template-rows: repeat(5, 80px);
     gap: 6px;
     width: 424px;
+    height: 424px;
     margin: 25px auto;
 }
-
 .tile {
     width: 80px;
     height: 80px;
+    padding: 0;
+    margin: 0;
     border: 2px solid #222;
     border-radius: 8px;
     font-size: 30px;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .tile:hover {
