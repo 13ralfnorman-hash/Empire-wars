@@ -45,6 +45,9 @@ h1 {
 
 .neutral {
     background: #4b5563;
+.enemy {
+    background: #a83232;
+}
 }
 
 button {
