@@ -48,7 +48,7 @@ h1 {
 }
 
 .enemy {
-    background: #a83232;
+    background: #a83232 !important;
 }
 
 }
