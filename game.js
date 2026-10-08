@@ -25,7 +25,7 @@ function createMap() {
             tile.textContent = "⚔️";
         }
 
-     // Berg
+        // Berg
 else if (i === 6 || i === 18) {
     tile.classList.add("mountain");
     tile.textContent = "⛰️";
@@ -42,6 +42,8 @@ else {
     tile.classList.add("neutral");
     tile.textContent = "🌲";
 }
+
+        
         tile.addEventListener("click", () => attack(tile));
 
         map.appendChild(tile);
