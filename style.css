@@ -74,3 +74,13 @@ button:hover {
     font-size: 18px;
     min-height: 25px;
 }
+
+.mountain {
+    background: #555555 !important;
+    color: white !important;
+}
+
+.farmland {
+    background: #b8860b !important;
+    color: white !important;
+}
