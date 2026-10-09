@@ -25,17 +25,19 @@ function createMap() {
             tile.textContent = "⚔️";
         }
             
+        
         // Städer
-        else if (i === 2 || i === 22) {
+        else if ([2, 19, 45, 78, 92].includes(i)) {
             tile.classList.add("city");
             tile.textContent = "🏙️";
         }
 
         // Byar
-        else if (i === 10 || i === 14) {
+        else if ([8, 26, 37, 56, 69, 85].includes(i)) {
             tile.classList.add("village");
             tile.textContent = "🏘️";
         }
+
 
 
         // Berg
