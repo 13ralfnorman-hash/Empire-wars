@@ -95,3 +95,22 @@ button:hover {
     background: #b8860b !important;
     color: white !important;
 }
+
+
+.economy {
+    max-width: 360px;
+    margin: 20px auto;
+    padding: 12px;
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 12px;
+}
+
+.economy h3 {
+    margin-top: 0;
+    color: #facc15;
+}
+
+.economy p {
+    margin: 8px 0;
+}
