@@ -60,7 +60,15 @@ else {
 }
 
         
-        tile.addEventListener("click", () => attack(tile));
+        tile.addEventListener("click", () => {
+    selectedTile = tile;
+
+    if (tile.classList.contains("player")) {
+        message.textContent = "🏰 Du har valt ditt territorium!";
+    } else {
+        attack(tile);
+    }
+});
 
         map.appendChild(tile);
     }
