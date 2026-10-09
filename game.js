@@ -132,6 +132,37 @@ function attack(tile) {
             : "💀 Attacken misslyckades!";
     }
 
+    
+function calculateEconomy() {
+    const farms = document.querySelectorAll("#map .farm-owned").length;
+    const cities = document.querySelectorAll("#map .city-owned").length;
+    const villages = document.querySelectorAll("#map .village-owned").length;
+    const capitals = document.querySelectorAll("#map .capital-owned").length;
+
+    const builtFarms = document.querySelectorAll("#map .building-farm").length;
+    const markets = document.querySelectorAll("#map .building-market").length;
+
+    // Skatter från territorier och särskilda platser
+    const taxes =
+        territory * 8 +
+        farms * 10 +
+        cities * 15 +
+        villages * 7 +
+        capitals * 40 +
+        builtFarms * 10 +
+        markets * 20;
+
+    // Varannan soldat kostar ungefär 1 guld per tur
+    const upkeep = Math.ceil(army / 2);
+
+    return {
+        taxes: taxes,
+        upkeep: upkeep,
+        net: taxes - upkeep
+    };
+}
+
+
     updateStats();
 }
 
