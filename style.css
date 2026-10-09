@@ -54,6 +54,15 @@ h1 {
     background: #a83232 !important;
 }
 
+.city {
+    background: #8b5cf6;
+}
+
+.village {
+    background: #d97706;
+}
+
+
 
 button {
     padding: 12px 18px;
