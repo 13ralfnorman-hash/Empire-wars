@@ -109,3 +109,4 @@ function attack(tile) {
 
     updateStats();
 }
+
