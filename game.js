@@ -153,7 +153,8 @@ function attack(tile) {
     if (isEnemy) chance = 0.35;
 
     if (Math.random() < chance) {
-        const wasFarm = tile.classList.contains("farmland");
+        constwasFarm = tile.classList.contains("farmland");
+
 if (wasFarm) tile.classList.add("farm-owned");
 
        tile.classList.remove(
