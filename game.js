@@ -156,11 +156,30 @@ function attack(tile) {
         const wasFarm = tile.classList.contains("farmland");
 if (wasFarm) tile.classList.add("farm-owned");
 
-        tile.classList.remove(
-            "neutral", "mountain", "farmland", "enemy"
-        );
-        tile.classList.add("player");
-        tile.textContent = "🏰";
+       tile.classList.remove(
+    "neutral", "mountain", "farmland",
+    "enemy", "city", "village"
+);
+
+tile.classList.add("player");
+
+if (wasFarm) {
+    tile.classList.add("farm-owned");
+}
+
+if (wasCity) {
+    tile.classList.add("city-owned");
+    tile.textContent = "🏙️";
+} else if (wasVillage) {
+    tile.classList.add("village-owned");
+    tile.textContent = "🏘️";
+} else if (wasFarm) {
+    tile.textContent = "🌾";
+} else if (isMountain) {
+    tile.textContent = "⛰️";
+} else {
+    tile.textContent = "🏰";
+}
 
         territory++;
         gold += wasFarm ? 35 : 20;
