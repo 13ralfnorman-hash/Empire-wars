@@ -114,3 +114,9 @@ button:hover {
 .economy p {
     margin: 8px 0;
 }
+
+.enemy-capital {
+    background-color: darkred !important;
+    border: 3px solid gold !important;
+    font-size: 18px;
+}
