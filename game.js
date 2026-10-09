@@ -6,6 +6,49 @@ const map = document.getElementById("map");
 const message = document.getElementById("message");
 let selectedTile = null;
 
+document.getElementById("upgrade").addEventListener("click", () => {
+    if (!selectedTile || !selectedTile.classList.contains("player")) {
+        message.textContent = "Välj ett territorium som du äger först!";
+        return;
+    }
+
+    // By till stad
+    if (selectedTile.classList.contains("village-owned")) {
+        if (gold < 100) {
+            message.textContent = "Du behöver 100 guld!";
+            return;
+        }
+
+        gold -= 100;
+        selectedTile.classList.remove("village-owned");
+        selectedTile.classList.add("city-owned");
+        selectedTile.textContent = "🏙️";
+        message.textContent = "🏙️ Du uppgraderade byn till en stad!";
+    }
+
+    // Stad till huvudstad
+    else if (selectedTile.classList.contains("city-owned")) {
+        if (gold < 250) {
+            message.textContent = "Du behöver 250 guld!";
+            return;
+        }
+
+        gold -= 250;
+        selectedTile.classList.remove("city-owned");
+        selectedTile.classList.add("capital-owned");
+        selectedTile.textContent = "👑";
+        message.textContent = "👑 Du byggde en huvudstad!";
+    }
+
+    else {
+        message.textContent = "Du kan bara uppgradera byar och städer!";
+        return;
+    }
+
+    updateStats();
+});
+
+
 function createMap() {
 
     for (let i = 0; i < 100; i++) {
