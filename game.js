@@ -204,6 +204,8 @@ function enemyTurn() {
                 "city-owned",
                 "village-owned",
                 "capital-owned"
+                "building-farm",
+                "building-market"
             );
 
             target.classList.add("enemy");
@@ -251,34 +253,22 @@ if (recruitButton) {
 // Avsluta tur och samla in inkomster
 const endTurnButton = document.getElementById("endTurn");
 
-if (endTurnButton) {
-    endTurnButton.addEventListener("click", () => {
-        const farms =
-            document.querySelectorAll("#map .farm-owned").length;
-        const cities =
-            document.querySelectorAll("#map .city-owned").length;
-        const villages =
-            document.querySelectorAll("#map .village-owned").length;
-        const capitals =
-            document.querySelectorAll("#map .capital-owned").length;
 
-        const income =
-            territory * 5 +
-            farms * 10 +
-            cities * 15 +
-            villages * 7 +
-            capitals * 40;
+const economy = calculateEconomy();
 
-        gold += income;
+gold = Math.max(0, gold + economy.net);
 
-// Nu gör fienderna sitt drag
+// Fienderna gör sitt drag
 const enemyMessage = enemyTurn();
 
 message.textContent =
-    "💰 Du fick " + income + " guld denna tur!" +
-    (enemyMessage ? " " + enemyMessage : "");
+    "💰 Skatter: " + economy.taxes +
+    " | ⚔️ Arméunderhåll: " + economy.upkeep +
+    " | Netto: " + economy.net + " guld. " +
+    enemyMessage;
 
 updateStats();
+
     });
 }
 
@@ -336,11 +326,60 @@ if (upgradeButton) {
     });
 }
 
+
+function buildBuilding(type, cost, buildingClass, buildingName) {
+    if (!selectedTile ||
+        !selectedTile.classList.contains("player")) {
+        message.textContent =
+            "Välj ett territorium som du äger först!";
+        return;
+    }
+
+    if (gold < cost) {
+        message.textContent =
+            "Du behöver " + cost + " guld!";
+        return;
+    }
+
+    if (
+        selectedTile.classList.contains("building-farm") ||
+        selectedTile.classList.contains("building-market")
+    ) {
+        message.textContent =
+            "Det finns redan en byggnad på detta territorium!";
+        return;
+    }
+
+    gold -= cost;
+    selectedTile.classList.add(buildingClass);
+
+    message.textContent =
+        "🏗️ Du byggde " + buildingName + "!";
+
+    updateStats();
+}
+
+document.getElementById("buildFarm").addEventListener("click", () => {
+    buildBuilding("farm", 80, "building-farm", "en gård");
+});
+
+document.getElementById("buildMarket").addEventListener("click", () => {
+    buildBuilding("market", 150, "building-market", "en marknad");
+});
+
+
 // Uppdatera siffrorna i gränssnittet
 function updateStats() {
     document.getElementById("gold").textContent = gold;
     document.getElementById("army").textContent = army;
     document.getElementById("territory").textContent = territory;
+    
+const economy = calculateEconomy();
+
+document.getElementById("taxIncome").textContent = economy.taxes;
+document.getElementById("armyUpkeep").textContent = economy.upkeep;
+document.getElementById("netIncome").textContent = economy.net;
+
 }
 
 // Starta spelet
