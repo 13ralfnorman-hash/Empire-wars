@@ -1,122 +1,402 @@
+
+/* ========================================
+   EMPIRE WARS — STRATEGISK KARTA
+======================================== */
+
+:root {
+    --bg: #101820;
+    --panel: #1a2731;
+    --panel-light: #263844;
+    --text: #edf4ed;
+    --muted: #b7c8c3;
+    --gold: #f5ca67;
+    --border: #43565b;
+    --player: #3988db;
+    --player-dark: #20578f;
+    --enemy: #cf4848;
+    --enemy-dark: #792d35;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background: #101820;
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 30px;
+    margin: 0;
+    min-height: 100vh;
+    padding: 24px 14px 40px;
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(ellipse at top, #294451 0%, transparent 55%),
+        linear-gradient(145deg, #101820, #14252a 60%, #101820);
 }
 
 h1 {
-    font-size: 42px;
+    margin: 0 0 8px;
+    text-align: center;
+    color: var(--gold);
+    font-size: clamp(30px, 5vw, 48px);
+    letter-spacing: 2px;
+    text-shadow: 0 3px 0 #634b20, 0 0 22px #f5ca6733;
 }
 
-.stats {
-    font-size: 20px;
-    margin: 20px;
-}
-#map {
-    display: grid;
-    grid-template-columns: repeat(10, 60px);
-    grid-template-rows: repeat(10, 60px);
-    gap: 4px;
-    width: 636px;
-    height: 636px;
-    margin: 25px auto;
+h2, h3 {
+    color: var(--gold);
 }
 
-.tile {
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #222;
-    border-radius: 8px;
-    font-size: 25px;
-    cursor: pointer;
-}
-
-
-.tile:hover {
-    transform: scale(1.05);
-}
-
-.player {
-    background: #2878d8;
-}
-
-.neutral {
-    background: #4b5563;
-}
-
-.enemy {
-    background: #a83232 !important;
-}
-
-.city {
-    background: #8b5cf6;
-}
-
-.village {
-    background: #d97706;
-}
-
-
-
-button {
-    padding: 12px 18px;
-    margin: 5px;
-    border: none;
-    border-radius: 8px;
-    background: #2878d8;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #4090ee;
+p {
+    line-height: 1.5;
 }
 
 #message {
-    font-size: 18px;
-    min-height: 25px;
+    min-height: 48px;
+    max-width: 1000px;
+    margin: 18px auto;
+    padding: 13px 16px;
+    color: #fff4cf;
+    background: #1b2c32;
+    border: 1px solid #6e6544;
+    border-radius: 10px;
+    box-shadow: 0 5px 18px #0003;
 }
+
+/* Statistikpaneler */
+
+.stats,
+#stats,
+.game-stats {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px auto;
+}
+
+.stats > *,
+#stats > *,
+.game-stats > * {
+    padding: 10px 15px;
+    background: linear-gradient(145deg, #2a3b43, #1b2a31);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+}
+
+/* Kartans ram */
+
+#map {
+    --map-gap: 3px;
+
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: var(--map-gap);
+
+    width: min(94vw, 760px);
+    aspect-ratio: 1;
+    margin: 20px auto;
+    padding: 8px;
+
+    overflow: hidden;
+    background: #172c2b;
+    border: 2px solid #657b64;
+    border-radius: 12px;
+
+    box-shadow:
+        0 0 0 4px #0c171a,
+        0 16px 40px #0007,
+        inset 0 0 22px #0008;
+}
+
+/* Grundutseende för varje ruta */
+
+.tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+
+    overflow: hidden;
+    cursor: pointer;
+
+    color: white;
+    font-size: clamp(13px, 2.8vw, 25px);
+    line-height: 1;
+
+    border: 1px solid #ffffff18;
+    border-radius: 4px;
+
+    transition:
+        transform 140ms ease,
+        filter 140ms ease,
+        border-color 140ms ease,
+        box-shadow 140ms ease;
+}
+
+.tile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        135deg,
+        #ffffff13,
+        transparent 45%,
+        #00000016
+    );
+}
+
+.tile:hover:not(:disabled) {
+    z-index: 2;
+    transform: scale(1.06);
+    filter: brightness(1.2);
+    border-color: #fff9;
+    box-shadow: 0 0 0 2px #ffffff66;
+}
+
+.tile:focus-visible {
+    z-index: 3;
+    outline: 3px solid white;
+    outline-offset: -3px;
+}
+
+/* Neutral terräng */
+
+.neutral {
+    background:
+        radial-gradient(ellipse at 25% 25%, #50754b 0 12%, transparent 14%),
+        radial-gradient(ellipse at 72% 70%, #315a3e 0 17%, transparent 19%),
+        linear-gradient(135deg, #466b45, #274b38);
+}
+
+.neutral::before {
+    content: "🌲";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.92;
+}
+
+/* Skog */
+
+.forest {
+    background:
+        radial-gradient(circle at 20% 30%, #62864c 0 8%, transparent 10%),
+        radial-gradient(circle at 78% 65%, #203e30 0 18%, transparent 20%),
+        linear-gradient(135deg, #2f6744, #163c2e);
+}
+
+/* Berg */
 
 .mountain {
-    background: #555555 !important;
-    color: white !important;
+    background:
+        radial-gradient(ellipse at 50% 85%, #8e988b 0 15%, transparent 16%),
+        linear-gradient(145deg, #737f7d, #37484a 75%);
+    border-color: #a9b4b1;
 }
+
+/* Jordbruksmark */
 
 .farmland {
-    background: #b8860b !important;
-    color: white !important;
+    background:
+        repeating-linear-gradient(
+            160deg,
+            #b69a4c 0 4px,
+            #8c773a 4px 7px
+        );
+    border-color: #d7c36f;
 }
 
+/* Byar och städer */
 
-.economy {
-    max-width: 360px;
-    margin: 20px auto;
-    padding: 12px;
-    background: #1e293b;
-    border: 1px solid #475569;
-    border-radius: 12px;
+.village {
+    background: linear-gradient(145deg, #c4a56a, #8a6943);
+    border-color: #f0d6a0;
 }
 
-.economy h3 {
-    margin-top: 0;
-    color: #facc15;
+.city {
+    background:
+        linear-gradient(145deg, #9babb2, #566b7c);
+    border-color: #d1e1e5;
 }
 
-.economy p {
-    margin: 8px 0;
+/* Spelarens territorier */
+
+.player {
+    background: linear-gradient(145deg, #4da5ef, var(--player-dark));
+    border: 2px solid #91d5ff;
+    box-shadow: inset 0 0 10px #bce7ff33;
+}
+
+.player::after {
+    background: linear-gradient(135deg, #ffffff20, transparent 55%, #001b3d44);
+}
+
+/* Fiendens territorier */
+
+.enemy {
+    background: linear-gradient(145deg, #e45c58, var(--enemy-dark));
+    border: 2px solid #ffaaa0;
+    box-shadow: inset 0 0 10px #ffb1a033;
 }
 
 .enemy-capital {
-    background-color: darkred !important;
-    border: 3px solid gold !important;
-    font-size: 18px;
+    background:
+        radial-gradient(circle, #ffdc7d44, transparent 65%),
+        linear-gradient(145deg, #8b1f2c, #4a101b) !important;
+    border: 3px solid var(--gold) !important;
+    box-shadow:
+        inset 0 0 12px #ffdc7d33,
+        0 0 8px #f5ca6744;
+    animation: capitalGlow 2.2s ease-in-out infinite;
+}
+
+.player-capital {
+    background:
+        radial-gradient(circle, #c4ecff44, transparent 65%),
+        linear-gradient(145deg, #246ab1, #123761) !important;
+    border: 3px solid #f7e4a0 !important;
+    box-shadow: inset 0 0 12px #ffffff22;
+}
+
+/* Erövrade resurser */
+
+.farm-owned {
+    border-bottom: 3px solid #f3d66d !important;
+}
+
+.city-owned {
+    border-bottom: 3px solid #e3e8f0 !important;
+}
+
+.village-owned {
+    border-bottom: 3px solid #e5bf82 !important;
+}
+
+.capital-owned {
+    border-bottom: 3px solid var(--gold) !important;
+}
+
+/* Byggnader */
+
+.building-farm {
+    background: linear-gradient(145deg, #8bb94f, #476c30) !important;
+    border: 2px solid #d9ef9b !important;
+}
+
+.building-market {
+    background: linear-gradient(145deg, #b68cde, #65458e) !important;
+    border: 2px solid #e5ccff !important;
+}
+
+/* Floder — lägg till klassen river på en ruta */
+
+.river {
+    background:
+        repeating-linear-gradient(
+            135deg,
+            #70d9f4 0 3px,
+            #238ab8 3px 8px,
+            #17638e 8px 12px
+        ) !important;
+    border: 1px solid #a8efff !important;
+    box-shadow: inset 0 0 9px #8de7ff55;
+}
+
+/* Markera valt territorium genom klassen selected */
+
+.tile.selected {
+    z-index: 3;
+    outline: 3px solid #fff2a3;
+    outline-offset: -3px;
+    box-shadow: 0 0 12px #ffe66b99;
+}
+
+/* Knappar */
+
+button:not(.tile) {
+    margin: 5px;
+    padding: 10px 16px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+
+    background: linear-gradient(145deg, #3b6875, #244650);
+    border: 1px solid #6d9ca4;
+    border-radius: 8px;
+
+    cursor: pointer;
+    transition: transform 140ms ease, filter 140ms ease;
+}
+
+button:not(.tile):hover:not(:disabled) {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+    filter: grayscale(0.5);
+}
+
+/* Ekonomin */
+
+#taxIncome,
+#armyUpkeep,
+#netIncome {
+    color: var(--gold);
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Lätt glöd runt huvudstäder */
+
+@keyframes capitalGlow {
+    0%, 100% {
+        box-shadow: inset 0 0 10px #ffdc7d22, 0 0 4px #f5ca6733;
+    }
+    50% {
+        box-shadow: inset 0 0 14px #ffdc7d66, 0 0 11px #f5ca6799;
+    }
+}
+
+/* Små skärmar */
+
+@media (max-width: 520px) {
+    body {
+        padding: 14px 6px 24px;
+    }
+
+    #map {
+        width: 96vw;
+        gap: 2px;
+        padding: 5px;
+    }
+
+    .tile {
+        border-radius: 3px;
+        font-size: clamp(10px, 3.4vw, 19px);
+    }
+
+    button:not(.tile) {
+        padding: 9px 11px;
+        font-size: 13px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
 }
