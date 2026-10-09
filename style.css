@@ -16,11 +16,11 @@ h1 {
 }
 #map {
     display: grid;
-    grid-template-columns: repeat(5, 80px);
-    grid-template-rows: repeat(5, 80px);
-    gap: 6px;
-    width: 424px;
-    height: 424px;
+    grid-template-columns: repeat(10, 60px);
+    grid-template-rows: repeat(10, 60px);
+    gap: 4px;
+    width: 636px;
+    height: 636px;
     margin: 25px auto;
 }
 .tile {
