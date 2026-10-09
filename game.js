@@ -7,7 +7,10 @@ let selectedTile = null;
 const map = document.getElementById("map");
 const message = document.getElementById("message");
 
-// Skapa kartan med 100 territorier
+// ================================
+// SKAPA KARTAN
+// ================================
+
 function createMap() {
     map.innerHTML = "";
 
@@ -41,8 +44,7 @@ function createMap() {
         tile.addEventListener("click", () => {
             if (tile.classList.contains("player")) {
                 selectedTile = tile;
-                message.textContent =
-                    "🏰 Du har valt ditt territorium!";
+                message.textContent = "🏰 Du har valt ditt territorium!";
             } else {
                 attack(tile);
             }
@@ -52,11 +54,18 @@ function createMap() {
     }
 }
 
-// Attackera och erövra territorier
+// ================================
+// ATTACKERA OCH ERÖVRA
+// ================================
+
 function attack(tile) {
     if (tile.classList.contains("player")) {
-        message.textContent = "Det där området är redan ditt!";
+        message.textContent = "Det området är redan ditt!";
         return;
+    }
+
+    if (tile.classList.contains("enemy")) {
+        // Du kan försöka erövra fiendens territorium
     }
 
     const isMountain = tile.classList.contains("mountain");
@@ -69,8 +78,7 @@ function attack(tile) {
     const cost = isMountain ? 5 : 3;
 
     if (army < cost) {
-        message.textContent =
-            "Du behöver minst " + cost + " soldater!";
+        message.textContent = "Du behöver minst " + cost + " soldater!";
         return;
     }
 
@@ -83,7 +91,6 @@ function attack(tile) {
     if (isEnemy) chance = 0.35;
 
     if (Math.random() < chance) {
-        // Spara vilken typ av territorium du erövrade
         if (wasFarm) tile.classList.add("farm-owned");
         if (wasCity) tile.classList.add("city-owned");
         if (wasVillage) tile.classList.add("village-owned");
@@ -123,7 +130,6 @@ function attack(tile) {
             : isMountain
             ? "⛰️ Du erövrade ett berg!"
             : "🔥 Du erövrade ett nytt territorium!";
-
     } else {
         message.textContent = isMountain
             ? "⛰️ Berget var svårt att inta!"
@@ -132,42 +138,13 @@ function attack(tile) {
             : "💀 Attacken misslyckades!";
     }
 
-    
-function calculateEconomy() {
-    const farms = document.querySelectorAll("#map .farm-owned").length;
-    const cities = document.querySelectorAll("#map .city-owned").length;
-    const villages = document.querySelectorAll("#map .village-owned").length;
-    const capitals = document.querySelectorAll("#map .capital-owned").length;
-
-    const builtFarms = document.querySelectorAll("#map .building-farm").length;
-    const markets = document.querySelectorAll("#map .building-market").length;
-
-    // Skatter från territorier och särskilda platser
-    const taxes =
-        territory * 8 +
-        farms * 10 +
-        cities * 15 +
-        villages * 7 +
-        capitals * 40 +
-        builtFarms * 10 +
-        markets * 20;
-
-    // Varannan soldat kostar ungefär 1 guld per tur
-    const upkeep = Math.ceil(army / 2);
-
-    return {
-        taxes: taxes,
-        upkeep: upkeep,
-        net: taxes - upkeep
-    };
-}
-
-
     updateStats();
 }
 
+// ================================
+// FIENDERNAS TUR
+// ================================
 
- // Fiendernas tur
 function enemyTurn() {
     const tiles = Array.from(map.children);
     const enemies = tiles.filter(tile =>
@@ -180,20 +157,15 @@ function enemyTurn() {
         const index = tiles.indexOf(enemyTile);
         const neighbors = [];
 
-        // Hitta rutorna ovanför och nedanför
         if (index >= 10) neighbors.push(tiles[index - 10]);
         if (index < 90) neighbors.push(tiles[index + 10]);
-
-        // Hitta rutorna till vänster och höger
         if (index % 10 !== 0) neighbors.push(tiles[index - 1]);
         if (index % 10 !== 9) neighbors.push(tiles[index + 1]);
 
-        // Välj de angränsande rutor som du äger
         const targets = neighbors.filter(tile =>
             tile.classList.contains("player")
         );
 
-        // Fienden har 45 % chans att lyckas med en attack
         if (targets.length > 0 && Math.random() < 0.45) {
             const target =
                 targets[Math.floor(Math.random() * targets.length)];
@@ -203,7 +175,7 @@ function enemyTurn() {
                 "farm-owned",
                 "city-owned",
                 "village-owned",
-                "capital-owned"
+                "capital-owned",
                 "building-farm",
                 "building-market"
             );
@@ -230,15 +202,16 @@ function enemyTurn() {
     return "";
 }
 
+// ================================
+// REKRYTERA SOLDATER
+// ================================
 
-// Rekrytera soldater
 const recruitButton = document.getElementById("recruit");
 
 if (recruitButton) {
     recruitButton.addEventListener("click", () => {
         if (gold < 20) {
-            message.textContent =
-                "Du har inte tillräckligt med guld!";
+            message.textContent = "Du har inte tillräckligt med guld!";
             return;
         }
 
@@ -250,39 +223,116 @@ if (recruitButton) {
     });
 }
 
-// Avsluta tur och samla in inkomster
-const endTurnButton = document.getElementById("endTurn");
+// ================================
+// EKONOMI: SKATTER OCH UNDERHÅLL
+// ================================
 
+function calculateEconomy() {
+    const farms = document.querySelectorAll("#map .farm-owned").length;
+    const cities = document.querySelectorAll("#map .city-owned").length;
+    const villages = document.querySelectorAll("#map .village-owned").length;
+    const capitals = document.querySelectorAll("#map .capital-owned").length;
+    const builtFarms = document.querySelectorAll("#map .building-farm").length;
+    const markets = document.querySelectorAll("#map .building-market").length;
 
-const economy = calculateEconomy();
+    const taxes =
+        territory * 8 +
+        farms * 10 +
+        cities * 15 +
+        villages * 7 +
+        capitals * 40 +
+        builtFarms * 10 +
+        markets * 20;
 
-gold = Math.max(0, gold + economy.net);
+    const upkeep = Math.ceil(army / 2);
 
-// Fienderna gör sitt drag
-const enemyMessage = enemyTurn();
+    return {
+        taxes: taxes,
+        upkeep: upkeep,
+        net: taxes - upkeep
+    };
+}
 
-message.textContent =
-    "💰 Skatter: " + economy.taxes +
-    " | ⚔️ Arméunderhåll: " + economy.upkeep +
-    " | Netto: " + economy.net + " guld. " +
-    enemyMessage;
+// ================================
+// BYGG GÅRDAR OCH MARKNADER
+// ================================
 
-updateStats();
+function buildBuilding(cost, buildingClass, name, emoji) {
+    if (!selectedTile || !selectedTile.classList.contains("player")) {
+        message.textContent = "Välj ett territorium som du äger först!";
+        return;
+    }
 
+    if (
+        selectedTile.classList.contains("building-farm") ||
+        selectedTile.classList.contains("building-market")
+    ) {
+        message.textContent = "Det finns redan en byggnad på detta territorium!";
+        return;
+    }
+
+    if (gold < cost) {
+        message.textContent = "Du behöver " + cost + " guld!";
+        return;
+    }
+
+    gold -= cost;
+    selectedTile.classList.add(buildingClass);
+    selectedTile.textContent = emoji;
+
+    message.textContent = "🏗️ Du byggde " + name + "!";
+    updateStats();
+}
+
+const buildFarmButton = document.getElementById("buildFarm");
+const buildMarketButton = document.getElementById("buildMarket");
+
+if (buildFarmButton) {
+    buildFarmButton.addEventListener("click", () => {
+        buildBuilding(80, "building-farm", "en gård", "🌾");
     });
 }
 
-// Uppgradera byar till städer och städer till huvudstäder
+if (buildMarketButton) {
+    buildMarketButton.addEventListener("click", () => {
+        buildBuilding(150, "building-market", "en marknad", "🏪");
+    });
+}
+
+// ================================
+// AVSLUTA TUR
+// ================================
+
+const endTurnButton = document.getElementById("endTurn");
+
+if (endTurnButton) {
+    endTurnButton.addEventListener("click", () => {
+        const economy = calculateEconomy();
+
+        gold = Math.max(0, gold + economy.net);
+
+        const enemyMessage = enemyTurn();
+
+        message.textContent =
+            "💰 Skatter: " + economy.taxes +
+            " | ⚔️ Arméunderhåll: " + economy.upkeep +
+            " | Netto: " + economy.net + " guld. " +
+            enemyMessage;
+
+        updateStats();
+    });
+}
+
+// ================================
+// UPPGRADERA BYAR OCH STÄDER
+// ================================
+
 const upgradeButton = document.getElementById("upgrade");
 
 if (upgradeButton) {
     upgradeButton.addEventListener("click", () => {
-        if (
-            !selectedTile ||
-            !selectedTile.classList.contains("player")
-        ) {
-            message.textContent =
-                "Välj ett territorium som du äger först!";
+        if (!selectedTile || !selectedTile.classList.contains("player")) {
+            message.textContent = "Välj ett territorium som du äger först!";
             return;
         }
 
@@ -297,12 +347,8 @@ if (upgradeButton) {
             selectedTile.classList.add("city-owned");
             selectedTile.textContent = "🏙️";
 
-            message.textContent =
-                "🏙️ Du uppgraderade byn till en stad!";
-
-        } else if (
-            selectedTile.classList.contains("city-owned")
-        ) {
+            message.textContent = "🏙️ Du uppgraderade byn till en stad!";
+        } else if (selectedTile.classList.contains("city-owned")) {
             if (gold < 250) {
                 message.textContent = "Du behöver 250 guld!";
                 return;
@@ -313,12 +359,9 @@ if (upgradeButton) {
             selectedTile.classList.add("capital-owned");
             selectedTile.textContent = "👑";
 
-            message.textContent =
-                "👑 Du byggde en huvudstad!";
-
+            message.textContent = "👑 Du byggde en huvudstad!";
         } else {
-            message.textContent =
-                "Du kan bara uppgradera byar och städer!";
+            message.textContent = "Du kan bara uppgradera byar och städer!";
             return;
         }
 
@@ -326,65 +369,30 @@ if (upgradeButton) {
     });
 }
 
+// ================================
+// UPPDATERA SIFFROR
+// ================================
 
-function buildBuilding(type, cost, buildingClass, buildingName) {
-    if (!selectedTile ||
-        !selectedTile.classList.contains("player")) {
-        message.textContent =
-            "Välj ett territorium som du äger först!";
-        return;
-    }
-
-    if (gold < cost) {
-        message.textContent =
-            "Du behöver " + cost + " guld!";
-        return;
-    }
-
-    if (
-        selectedTile.classList.contains("building-farm") ||
-        selectedTile.classList.contains("building-market")
-    ) {
-        message.textContent =
-            "Det finns redan en byggnad på detta territorium!";
-        return;
-    }
-
-    gold -= cost;
-    selectedTile.classList.add(buildingClass);
-
-    message.textContent =
-        "🏗️ Du byggde " + buildingName + "!";
-
-    updateStats();
-}
-
-document.getElementById("buildFarm").addEventListener("click", () => {
-    buildBuilding("farm", 80, "building-farm", "en gård");
-});
-
-document.getElementById("buildMarket").addEventListener("click", () => {
-    buildBuilding("market", 150, "building-market", "en marknad");
-});
-
-
-// Uppdatera siffrorna i gränssnittet
 function updateStats() {
     document.getElementById("gold").textContent = gold;
     document.getElementById("army").textContent = army;
     document.getElementById("territory").textContent = territory;
-    
-const economy = calculateEconomy();
 
-document.getElementById("taxIncome").textContent = economy.taxes;
-document.getElementById("armyUpkeep").textContent = economy.upkeep;
-document.getElementById("netIncome").textContent = economy.net;
+    const economy = calculateEconomy();
 
+    const taxElement = document.getElementById("taxIncome");
+    const upkeepElement = document.getElementById("armyUpkeep");
+    const netElement = document.getElementById("netIncome");
+
+    if (taxElement) taxElement.textContent = economy.taxes;
+    if (upkeepElement) upkeepElement.textContent = economy.upkeep;
+    if (netElement) netElement.textContent = economy.net;
 }
 
-// Starta spelet
+// ================================
+// STARTA SPELET
+// ================================
+
 createMap();
 updateStats();
-
-
 
