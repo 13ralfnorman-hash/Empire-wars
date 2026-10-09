@@ -9,6 +9,17 @@ let enemyCapitalsRemaining = 2;
 const map = document.getElementById("map");
 const message = document.getElementById("message");
 
+// Terräng och placeringar på kartan
+const PLAYER_CAPITAL = 55;
+const ENEMY_CAPITALS = [0, 24];
+const ENEMIES = [4, 20];
+const CITIES = [2, 19, 45, 78, 92];
+const VILLAGES = [8, 26, 37, 56, 69, 85];
+const MOUNTAINS = [6, 18, 33, 62, 81];
+const FARMLAND = [7, 17, 29, 48, 73];
+const FORESTS = [11, 13, 21, 31, 39, 42, 51, 64, 71, 83, 96];
+const RIVERS = [14, 15, 16, 27, 38, 49, 59, 68, 77, 87, 97];
+
 // ================================
 // SKAPA KARTAN
 // ================================
@@ -19,39 +30,56 @@ function createMap() {
     for (let i = 0; i < 100; i++) {
         const tile = document.createElement("button");
         tile.classList.add("tile");
+        tile.dataset.index = i;
+        tile.setAttribute("aria-label", "Territorium " + (i + 1));
 
-        if (i === 55) {
+        if (i === PLAYER_CAPITAL) {
             tile.classList.add("player", "player-capital");
             tile.textContent = "👑";
-        } else if ([0, 24].includes(i)) {
-    tile.classList.add("enemy", "enemy-capital");
-    tile.textContent = "🏰👑";
-        } else if ([4, 20].includes(i)) {
+            tile.title = "Din huvudstad";
+        } else if (ENEMY_CAPITALS.includes(i)) {
+            tile.classList.add("enemy", "enemy-capital");
+            tile.textContent = "🏰";
+            tile.title = "Fiendens huvudstad";
+        } else if (ENEMIES.includes(i)) {
             tile.classList.add("enemy");
             tile.textContent = "⚔️";
-        } else if ([2, 19, 45, 78, 92].includes(i)) {
+            tile.title = "Fiendens territorium";
+        } else if (CITIES.includes(i)) {
             tile.classList.add("city");
             tile.textContent = "🏙️";
-        } else if ([8, 26, 37, 56, 69, 85].includes(i)) {
+            tile.title = "Stad";
+        } else if (VILLAGES.includes(i)) {
             tile.classList.add("village");
             tile.textContent = "🏘️";
-        } else if ([6, 18, 33, 62, 81].includes(i)) {
+            tile.title = "By";
+        } else if (MOUNTAINS.includes(i)) {
             tile.classList.add("mountain");
             tile.textContent = "⛰️";
-        } else if ([7, 17, 29, 48, 73].includes(i)) {
+            tile.title = "Berg — svårare att erövra";
+        } else if (FARMLAND.includes(i)) {
             tile.classList.add("farmland");
             tile.textContent = "🌾";
+            tile.title = "Jordbruksmark";
+        } else if (RIVERS.includes(i)) {
+            tile.classList.add("river");
+            tile.textContent = "🌊";
+            tile.title = "Flod — kan inte erövras";
+        } else if (FORESTS.includes(i)) {
+            tile.classList.add("forest");
+            tile.textContent = "🌲";
+            tile.title = "Skog — svårare att anfalla";
         } else {
             tile.classList.add("neutral");
             tile.textContent = "🌲";
+            tile.title = "Neutral mark";
         }
 
         tile.addEventListener("click", () => {
             if (gameOver) return;
 
             if (tile.classList.contains("player")) {
-                selectedTile = tile;
-                message.textContent = "🏰 Du har valt ditt territorium!";
+                selectTerritory(tile);
             } else {
                 attack(tile);
             }
@@ -61,25 +89,50 @@ function createMap() {
     }
 }
 
+function selectTerritory(tile) {
+    if (selectedTile) {
+        selectedTile.classList.remove("selected");
+    }
+
+    selectedTile = tile;
+    selectedTile.classList.add("selected");
+    message.textContent = "🏰 Du har valt ditt territorium!";
+}
+
 // ================================
-// KONTROLLERA SPELETS SLUT
+// HJÄLPFUNKTIONER
+// ================================
+
+function isRiver(tile) {
+    return tile.classList.contains("river");
+}
+
+function getNeighbors(index) {
+    const neighbors = [];
+
+    if (index >= 10) neighbors.push(index - 10);
+    if (index < 90) neighbors.push(index + 10);
+    if (index % 10 !== 0) neighbors.push(index - 1);
+    if (index % 10 !== 9) neighbors.push(index + 1);
+
+    return neighbors;
+}
+
+// ================================
+// SPELETS SLUT
 // ================================
 
 function finishGame(won) {
+    if (gameOver) return;
+
     gameOver = true;
 
-    if (won) {
-        message.textContent =
-            "🏆 SEGER! Du har besegrat alla fiendehuvudstäder och vunnit Empire Wars!";
-    } else {
-        message.textContent =
-            "💀 NEDERLAG! Din huvudstad har fallit. Ladda om sidan för att spela igen.";
-    }
+    message.textContent = won
+        ? "🏆 SEGER! Du har besegrat alla fiendehuvudstäder!"
+        : "💀 NEDERLAG! Din huvudstad har fallit. Ladda om sidan för att spela igen.";
 
-    document.querySelectorAll("button").forEach(button => {
-        if (button.closest("#map")) {
-            button.disabled = true;
-        }
+    map.querySelectorAll("button").forEach(button => {
+        button.disabled = true;
     });
 
     ["recruit", "endTurn", "upgrade", "buildFarm", "buildMarket"]
@@ -101,15 +154,21 @@ function attack(tile) {
         return;
     }
 
+    if (isRiver(tile)) {
+        message.textContent = "🌊 Du måste hitta en väg runt floden!";
+        return;
+    }
+
     const isMountain = tile.classList.contains("mountain");
-    const isForest = tile.classList.contains("neutral");
+    const isForest = tile.classList.contains("forest") ||
+                     tile.classList.contains("neutral");
     const isEnemy = tile.classList.contains("enemy");
     const wasFarm = tile.classList.contains("farmland");
     const wasCity = tile.classList.contains("city");
     const wasVillage = tile.classList.contains("village");
     const wasEnemyCapital = tile.classList.contains("enemy-capital");
 
-    const cost = isMountain ? 5 : 3;
+    const cost = isMountain ? 5 : isEnemy ? 4 : 3;
 
     if (army < cost) {
         message.textContent = "Du behöver minst " + cost + " soldater!";
@@ -118,10 +177,11 @@ function attack(tile) {
 
     army -= cost;
 
-    let chance = 0.7;
-    if (isMountain) chance = 0.4;
-    if (isForest) chance = 0.65;
-    if (isEnemy) chance = 0.35;
+    let chance = 0.78;
+    if (isMountain) chance = 0.45;
+    if (isForest) chance = 0.60;
+    if (isEnemy) chance = 0.42;
+    if (wasEnemyCapital) chance = 0.35;
 
     if (Math.random() < chance) {
         if (wasFarm) tile.classList.add("farm-owned");
@@ -130,6 +190,7 @@ function attack(tile) {
 
         tile.classList.remove(
             "neutral",
+            "forest",
             "mountain",
             "farmland",
             "enemy",
@@ -154,6 +215,7 @@ function attack(tile) {
             tile.textContent = "🏰";
         }
 
+        tile.title = "Ditt territorium";
         territory++;
         gold += wasFarm ? 35 : 20;
 
@@ -180,15 +242,17 @@ function attack(tile) {
             message.textContent = "🌾 Du erövrade jordbruksmark och fick 35 guld!";
         } else if (isMountain) {
             message.textContent = "⛰️ Du erövrade ett berg!";
+        } else if (isEnemy) {
+            message.textContent = "⚔️ Du besegrade fiendens försvar!";
         } else {
-            message.textContent = "🔥 Du erövrade ett nytt territorium!";
+            message.textContent = "🛡️ Du erövrade nytt territorium!";
         }
     } else {
         message.textContent = isMountain
             ? "⛰️ Berget var svårt att inta!"
             : isEnemy
             ? "⚔️ Fienden försvarade sitt territorium!"
-            : "💀 Attacken misslyckades!";
+            : "💥 Attacken misslyckades!";
     }
 
     updateStats();
@@ -211,19 +275,15 @@ function enemyTurn() {
     enemies.forEach(enemyTile => {
         if (gameOver) return;
 
-        const index = tiles.indexOf(enemyTile);
-        const neighbors = [];
+        const index = Number(enemyTile.dataset.index);
+        const targets = getNeighbors(index)
+            .map(i => tiles[i])
+            .filter(tile =>
+                tile.classList.contains("player") &&
+                !isRiver(tile)
+            );
 
-        if (index >= 10) neighbors.push(tiles[index - 10]);
-        if (index < 90) neighbors.push(tiles[index + 10]);
-        if (index % 10 !== 0) neighbors.push(tiles[index - 1]);
-        if (index % 10 !== 9) neighbors.push(tiles[index + 1]);
-
-        const targets = neighbors.filter(tile =>
-            tile.classList.contains("player")
-        );
-
-        if (targets.length > 0 && Math.random() < 0.45) {
+        if (targets.length > 0 && Math.random() < 0.30) {
             const target =
                 targets[Math.floor(Math.random() * targets.length)];
 
@@ -238,11 +298,13 @@ function enemyTurn() {
                 "village-owned",
                 "capital-owned",
                 "building-farm",
-                "building-market"
+                "building-market",
+                "selected"
             );
 
             target.classList.add("enemy");
             target.textContent = "⚔️";
+            target.title = "Fiendekontrollerat territorium";
 
             territory--;
             captured++;
@@ -260,7 +322,7 @@ function enemyTurn() {
     if (gameOver) return "💀 Din huvudstad har fallit!";
 
     if (captured > 0) {
-        return "⚔️ Fienden erövrade " + captured + " av dina territorier!";
+        return "⚔️ Fienden erövrade " + captured + " territorier!";
     }
 
     return "🛡️ Fienden anföll inte denna tur.";
@@ -271,12 +333,12 @@ function enemyTurn() {
 // ================================
 
 function calculateEconomy() {
-    const farms = document.querySelectorAll("#map .farm-owned").length;
-    const cities = document.querySelectorAll("#map .city-owned").length;
-    const villages = document.querySelectorAll("#map .village-owned").length;
-    const capitals = document.querySelectorAll("#map .capital-owned").length;
-    const builtFarms = document.querySelectorAll("#map .building-farm").length;
-    const markets = document.querySelectorAll("#map .building-market").length;
+    const farms = map.querySelectorAll(".farm-owned").length;
+    const cities = map.querySelectorAll(".city-owned").length;
+    const villages = map.querySelectorAll(".village-owned").length;
+    const capitals = map.querySelectorAll(".capital-owned").length;
+    const builtFarms = map.querySelectorAll(".building-farm").length;
+    const markets = map.querySelectorAll(".building-market").length;
 
     const taxes =
         territory * 8 +
@@ -312,7 +374,7 @@ function buildBuilding(cost, buildingClass, name, emoji) {
         selectedTile.classList.contains("building-farm") ||
         selectedTile.classList.contains("building-market")
     ) {
-        message.textContent = "Det finns redan en byggnad på detta territorium!";
+        message.textContent = "Det finns redan en byggnad här!";
         return;
     }
 
@@ -324,6 +386,7 @@ function buildBuilding(cost, buildingClass, name, emoji) {
     gold -= cost;
     selectedTile.classList.add(buildingClass);
     selectedTile.textContent = emoji;
+    selectedTile.title = name;
 
     message.textContent = "🏗️ Du byggde " + name + "!";
     updateStats();
@@ -419,6 +482,7 @@ if (upgradeButton) {
             selectedTile.classList.remove("village-owned");
             selectedTile.classList.add("city-owned");
             selectedTile.textContent = "🏙️";
+            selectedTile.title = "Din stad";
 
             message.textContent = "🏙️ Du uppgraderade byn till en stad!";
         } else if (selectedTile.classList.contains("city-owned")) {
@@ -431,6 +495,7 @@ if (upgradeButton) {
             selectedTile.classList.remove("city-owned");
             selectedTile.classList.add("capital-owned");
             selectedTile.textContent = "👑";
+            selectedTile.title = "Din huvudstad";
 
             message.textContent = "👑 Du byggde en huvudstad!";
         } else {
@@ -443,7 +508,7 @@ if (upgradeButton) {
 }
 
 // ================================
-// UPPDATERA SIFFROR
+// UPPDATERA STATISTIK
 // ================================
 
 function updateStats() {
@@ -468,3 +533,4 @@ function updateStats() {
 
 createMap();
 updateStats();
+
