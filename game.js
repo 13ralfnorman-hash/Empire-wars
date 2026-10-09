@@ -86,6 +86,7 @@ function attack(tile) {
 
     if (Math.random() < chance) {
         const wasFarm = tile.classList.contains("farmland");
+if (wasFarm) tile.classList.add("farm-owned");
 
         tile.classList.remove(
             "neutral", "mountain", "farmland", "enemy"
