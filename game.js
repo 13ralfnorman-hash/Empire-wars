@@ -135,6 +135,69 @@ function attack(tile) {
     updateStats();
 }
 
+
+ // Fiendernas tur
+function enemyTurn() {
+    const tiles = Array.from(map.children);
+    const enemies = tiles.filter(tile =>
+        tile.classList.contains("enemy")
+    );
+
+    let captured = 0;
+
+    enemies.forEach(enemyTile => {
+        const index = tiles.indexOf(enemyTile);
+        const neighbors = [];
+
+        // Hitta rutorna ovanför och nedanför
+        if (index >= 10) neighbors.push(tiles[index - 10]);
+        if (index < 90) neighbors.push(tiles[index + 10]);
+
+        // Hitta rutorna till vänster och höger
+        if (index % 10 !== 0) neighbors.push(tiles[index - 1]);
+        if (index % 10 !== 9) neighbors.push(tiles[index + 1]);
+
+        // Välj de angränsande rutor som du äger
+        const targets = neighbors.filter(tile =>
+            tile.classList.contains("player")
+        );
+
+        // Fienden har 45 % chans att lyckas med en attack
+        if (targets.length > 0 && Math.random() < 0.45) {
+            const target =
+                targets[Math.floor(Math.random() * targets.length)];
+
+            target.classList.remove(
+                "player",
+                "farm-owned",
+                "city-owned",
+                "village-owned",
+                "capital-owned"
+            );
+
+            target.classList.add("enemy");
+            target.textContent = "⚔️";
+
+            territory--;
+
+            if (selectedTile === target) {
+                selectedTile = null;
+            }
+
+            captured++;
+        }
+    });
+
+    updateStats();
+
+    if (captured > 0) {
+        return "⚔️ Fienden erövrade " + captured + " av dina territorier!";
+    }
+
+    return "";
+}
+
+
 // Rekrytera soldater
 const recruitButton = document.getElementById("recruit");
 
