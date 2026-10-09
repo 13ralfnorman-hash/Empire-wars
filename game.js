@@ -111,3 +111,34 @@ if (wasFarm) tile.classList.add("farm-owned");
     updateStats();
 }
 
+
+document.getElementById("recruit").addEventListener("click", () => {
+    if (gold < 20) {
+        message.textContent = "Du har inte tillräckligt med guld!";
+        return;
+    }
+
+    gold -= 20;
+    army += 5;
+    message.textContent = "⚔️ Du rekryterade 5 soldater!";
+    updateStats();
+});
+
+document.getElementById("endTurn").addEventListener("click", () => {
+    const farms = document.querySelectorAll("#map .farm-owned").length;
+    const income = territory * 5 + farms * 10;
+
+    gold += income;
+    message.textContent = "⏭️ Ny tur! Du fick " + income + " guld.";
+    updateStats();
+});
+
+function updateStats() {
+    document.getElementById("gold").textContent = gold;
+    document.getElementById("army").textContent = army;
+    document.getElementById("territory").textContent = territory;
+}
+
+createMap();
+
+
