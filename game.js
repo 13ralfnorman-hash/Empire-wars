@@ -7,7 +7,7 @@ const message = document.getElementById("message");
 
 function createMap() {
 
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 100; i++) {
 
         const tile = document.createElement("button");
 
