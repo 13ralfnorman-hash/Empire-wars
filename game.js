@@ -6,6 +6,7 @@ const map = document.getElementById("map");
 const message = document.getElementById("message");
 let selectedTile = null;
 
+
 document.getElementById("upgrade").addEventListener("click", () => {
     if (!selectedTile || !selectedTile.classList.contains("player")) {
         message.textContent = "Välj ett territorium som du äger först!";
