@@ -195,10 +195,14 @@ document.getElementById("recruit").addEventListener("click", () => {
 document.getElementById("endTurn").addEventListener("click", () => {
     const farms = document.querySelectorAll("#map .farm-owned").length;
     const income = territory * 5 + farms * 10;
+    const capitals = document.querySelectorAll("#map .capital-owned").length;
 
-    gold += income;
-    message.textContent = "⏭️ Ny tur! Du fick " + income + " guld.";
-    updateStats();
+    const income =
+    territory * 5 +
+    farms * 10 +
+    cities * 15 +
+    villages * 7 +
+    capitals * 40;
 });
 
 function updateStats() {
