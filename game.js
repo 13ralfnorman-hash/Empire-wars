@@ -50,8 +50,8 @@ else {
     }
 }
 
-function attack(tile) {
 
+function attack(tile) {
     if (tile.classList.contains("player")) {
         message.textContent = "Det där området är redan ditt 😭";
         return;
@@ -62,63 +62,50 @@ function attack(tile) {
         return;
     }
 
-    army -= 3;
+    const isMountain = tile.classList.contains("mountain");
+    const isForest = tile.classList.contains("neutral");
+    const isEnemy = tile.classList.contains("enemy");
 
-    const success = Math.random() > 0.3;
+    // Berg kräver fler soldater
+    const cost = isMountain ? 5 : 3;
 
-    if (success) {
-
-        tile.classList.remove("neutral");
-        tile.classList.add("player");
-
-        tile.textContent = "🏰";
-
-        territory++;
-
-        gold += 20;
-
-        message.textContent = "🔥 Du erövrade ett nytt område!";
-
-    } else {
-
-        message.textContent = "💀 Attacken misslyckades!";
-    }
-
-    updateStats();
-}
-
-document.getElementById("recruit").addEventListener("click", () => {
-
-    if (gold < 20) {
-        message.textContent = "Du har inte tillräckligt med guld!";
+    if (army < cost) {
+        message.textContent =
+            "Du behöver minst " + cost + " soldater för att attackera här!";
         return;
     }
 
-    gold -= 20;
-    army += 5;
+    army -= cost;
 
-    message.textContent = "⚔️ Du rekryterade 5 soldater!";
+    // Berg och fiender är svårare att besegra
+    let chance = 0.7;
+
+    if (isMountain) chance = 0.4;
+    if (isForest) chance = 0.65;
+    if (isEnemy) chance = 0.35;
+
+    if (Math.random() < chance) {
+        const wasFarm = tile.classList.contains("farmland");
+
+        tile.classList.remove(
+            "neutral", "mountain", "farmland", "enemy"
+        );
+        tile.classList.add("player");
+        tile.textContent = "🏰";
+
+        territory++;
+        gold += wasFarm ? 35 : 20;
+
+        message.textContent = wasFarm
+            ? "🌾 Du erövrade jordbruksmark! Du fick 35 guld."
+            : "🔥 Du erövrade ett nytt område!";
+    } else {
+        message.textContent = isMountain
+            ? "⛰️ Berget var svårt att inta! Attacken misslyckades."
+            : isEnemy
+            ? "⚔️ Fienden försvarade sitt territorium!"
+            : "💀 Attacken misslyckades!";
+    }
 
     updateStats();
-});
-
-document.getElementById("endTurn").addEventListener("click", () => {
-
-    gold += territory * 5;
-
-    message.textContent =
-        "⏭️ Ny tur! Du fick " + (territory * 5) + " guld.";
-
-    updateStats();
-});
-
-function updateStats() {
-
-    document.getElementById("gold").textContent = gold;
-
-    document.getElementById("army").textContent = army;
-
-    document.getElementById("territory").textContent = territory;
 }
-
-createMap();
