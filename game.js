@@ -240,10 +240,14 @@ if (endTurnButton) {
 
         gold += income;
 
-        message.textContent =
-            "💰 Du fick " + income + " guld denna tur!";
+// Nu gör fienderna sitt drag
+const enemyMessage = enemyTurn();
 
-        updateStats();
+message.textContent =
+    "💰 Du fick " + income + " guld denna tur!" +
+    (enemyMessage ? " " + enemyMessage : "");
+
+updateStats();
     });
 }
 
