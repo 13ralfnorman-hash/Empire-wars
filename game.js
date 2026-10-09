@@ -4,6 +4,7 @@ let territory = 1;
 
 const map = document.getElementById("map");
 const message = document.getElementById("message");
+let selectedTile = null;
 
 function createMap() {
 
