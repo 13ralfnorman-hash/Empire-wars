@@ -24,8 +24,8 @@ function createMap() {
             tile.classList.add("player", "player-capital");
             tile.textContent = "👑";
         } else if ([0, 24].includes(i)) {
-            tile.classList.add("enemy", "enemy-capital");
-            tile.textContent = "👑";
+    tile.classList.add("enemy", "enemy-capital");
+    tile.textContent = "🏰👑";
         } else if ([4, 20].includes(i)) {
             tile.classList.add("enemy");
             tile.textContent = "⚔️";
